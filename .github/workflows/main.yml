@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Handle the form data
       run: |
@@ -27,7 +27,7 @@ jobs:
         curl -L -o uploaded_file.txt "${{ github.event.client_payload.file }}"
 
     - name: Upload file as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: form-submission-file
         path: ./uploaded_file.txt
