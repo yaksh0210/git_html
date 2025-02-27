@@ -2,7 +2,7 @@ name: Handle Form Submission
 
 on:
   repository_dispatch:
-    types: [form_submission]
+    types: [ form_submission ]
 
 jobs:
   process_submission:
@@ -17,3 +17,17 @@ jobs:
         echo "Name: ${{ github.event.client_payload.name }}"
         echo "Email: ${{ github.event.client_payload.email }}"
         echo "Age: ${{ github.event.client_payload.age }}"
+
+    - name: Save the uploaded file
+      run: |
+        echo "File upload detected"
+        echo "${{ github.event.client_payload.file }}"
+
+        # Here we simulate saving the file uploaded with form submission
+        curl -L -o uploaded_file.txt "${{ github.event.client_payload.file }}"
+
+    - name: Upload file as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: form-submission-file
+        path: ./uploaded_file.txt
