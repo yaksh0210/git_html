@@ -10,21 +10,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     - name: Handle the form data
       run: |
         echo "Name: ${{ github.event.client_payload.name }}"
         echo "Email: ${{ github.event.client_payload.email }}"
         echo "Age: ${{ github.event.client_payload.age }}"
-
-    - name: Save the uploaded file
-      run: |
-        echo "File upload detected"
-        echo "${{ github.event.client_payload.file }}"
-
-    - name: Upload file as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: form-submission-file
-        path: /
