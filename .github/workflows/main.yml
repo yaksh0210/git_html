@@ -1,8 +1,8 @@
-name: Handle Form Submission
+name: Handle Form Submission and Generate Excel
 
 on:
   repository_dispatch:
-    types: [ form_submission ]
+    types: [form_submission]
 
 jobs:
   process_submission:
@@ -12,8 +12,40 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Handle the form data
+    - name: Install Python & Dependencies
       run: |
-        echo "Name: ${{ github.event.client_payload.name }}"
-        echo "Email: ${{ github.event.client_payload.email }}"
-        echo "Age: ${{ github.event.client_payload.age }}"
+        sudo apt update
+        sudo apt install -y python3 python3-pip
+        pip3 install pandas openpyxl
+
+    - name: Generate Excel File
+      run: |
+        python3 <<EOF
+        import pandas as pd
+        import os
+
+        # Form data from event
+        name = "${{ github.event.client_payload.name }}"
+        email = "${{ github.event.client_payload.email }}"
+        age = "${{ github.event.client_payload.age }}"
+
+        # Define file path
+        file_path = "form_submission.xlsx"
+
+        # Check if file exists
+        if os.path.exists(file_path):
+            df_old = pd.read_excel(file_path)
+            df_new = pd.DataFrame([{"Name": name, "Email": email, "Age": age}])
+            df = pd.concat([df_old, df_new], ignore_index=True)
+        else:
+            df = pd.DataFrame([{"Name": name, "Email": email, "Age": age}])
+
+        # Save to Excel
+        df.to_excel(file_path, index=False)
+        EOF
+
+    - name: Upload Excel as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: form-data
+        path: form_submission.xlsx
